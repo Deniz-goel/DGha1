@@ -1,5 +1,4 @@
 package htw.berlin.prog2.ha1;
-
 /**
  * Eine Klasse, die das Verhalten des Online Taschenrechners imitiert, welcher auf
  * https://www.online-calculator.com/ aufgerufen werden kann (ohne die Memory-Funktionen)
@@ -7,12 +6,15 @@ package htw.berlin.prog2.ha1;
  * Enthält mit Absicht noch diverse Bugs oder unvollständige Funktionen.
  */
 public class Calculator {
-
     private String screen = "0";
-
     private double latestValue;
 
     private String latestOperation = "";
+
+    private int count = 0;
+
+    private boolean isNegative = false;
+
 
     /**
      * @return den aktuellen Bildschirminhalt als String
@@ -20,7 +22,6 @@ public class Calculator {
     public String readScreen() {
         return screen;
     }
-
     /**
      * Empfängt den Wert einer gedrückten Zifferntaste. Da man nur eine Taste auf einmal
      * drücken kann muss der Wert positiv und einstellig sein und zwischen 0 und 9 liegen.
@@ -29,9 +30,13 @@ public class Calculator {
      * @param digit Die Ziffer, deren Taste gedrückt wurde
      */
     public void pressDigitKey(int digit) {
+        count = count + 1;
+
         if(digit > 9 || digit < 0) throw new IllegalArgumentException();
 
         if(screen.equals("0") || latestValue == Double.parseDouble(screen)) screen = "";
+
+        if(isNegative) screen = "-";
 
         screen = screen + digit;
     }
@@ -45,11 +50,11 @@ public class Calculator {
      * im Ursprungszustand ist.
      */
     public void pressClearKey() {
+        count = 0;
         screen = "0";
         latestOperation = "";
         latestValue = 0.0;
     }
-
     /**
      * Empfängt den Wert einer gedrückten binären Operationstaste, also eine der vier Operationen
      * Addition, Substraktion, Division, oder Multiplikation, welche zwei Operanden benötigen.
@@ -63,7 +68,6 @@ public class Calculator {
         latestValue = Double.parseDouble(screen);
         latestOperation = operation;
     }
-
     /**
      * Empfängt den Wert einer gedrückten unären Operationstaste, also eine der drei Operationen
      * Quadratwurzel, Prozent, Inversion, welche nur einen Operanden benötigen.
@@ -83,9 +87,7 @@ public class Calculator {
         screen = Double.toString(result);
         if(screen.equals("NaN")) screen = "Error";
         if(screen.contains(".") && screen.length() > 11) screen = screen.substring(0, 10);
-
     }
-
     /**
      * Empfängt den Befehl der gedrückten Dezimaltrennzeichentaste, im Englischen üblicherweise "."
      * Fügt beim ersten Mal Drücken dem aktuellen Bildschirminhalt das Trennzeichen auf der rechten
@@ -96,7 +98,6 @@ public class Calculator {
     public void pressDotKey() {
         if(!screen.contains(".")) screen = screen + ".";
     }
-
     /**
      * Empfängt den Befehl der gedrückten Vorzeichenumkehrstaste ("+/-").
      * Zeigt der Bildschirm einen positiven Wert an, so wird ein "-" links angehängt, der Bildschirm
@@ -105,6 +106,9 @@ public class Calculator {
      * entfernt und der Inhalt fortan als positiv interpretiert.
      */
     public void pressNegativeKey() {
+        count = count + 1;
+
+        if(count == 1)isNegative = true;
         screen = screen.startsWith("-") ? screen.substring(1) : "-" + screen;
     }
 
@@ -118,6 +122,7 @@ public class Calculator {
      * und das Ergebnis direkt angezeigt.
      */
     public void pressEqualsKey() {
+        count = 0;
         var result = switch(latestOperation) {
             case "+" -> latestValue + Double.parseDouble(screen);
             case "-" -> latestValue - Double.parseDouble(screen);
