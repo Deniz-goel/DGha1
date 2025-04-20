@@ -90,7 +90,7 @@ class CalculatorTest {
 
 
     //TODO hier weitere Tests erstellen
-    //Gibt das Ergebnis einer Subrtraktion aus
+    //Gibt das Ergebnis einer Subrtraktion zweier negativer Nummern aus
     @Test
     @DisplayName("should display result after substracting two negative numbers")
     void testNegativeSubstracting() {
